@@ -1,6 +1,6 @@
 # Quizgame
 
-Quizgame is a simple questions ans answers game. The client load all questions and answers from a **CSV** file.
+Quizgame is a simple questions and answers game. The client load all questions and answers from a **CSV** file.
 
 ## Features
 - flag -csv: pass the CSV file;

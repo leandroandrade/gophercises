@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"math/rand"
 )
 
 type problem struct {
@@ -60,15 +61,26 @@ func countableAnswer(timer *time.Timer, answerChannel chan string, p problem, co
 	}
 }
 
+func shuffleQuestions(problems []problem) {
+	rand.Shuffle(len(problems), func(i, j int) {
+		problems[i], problems[j] = problems[j], problems[i]
+	})
+}
+
 func main() {
 	csvFilename := flag.String("csv", "problems.csv", "a CSV file in the format of 'question,answer'")
 	timeLimit := flag.Int("limit", 30, "the time limit for the quiz seconds")
+	random := flag.Bool("random", false, "shuffle the quiz order each time it is run")
 
 	flag.Parse()
 
 	problems, err := readFile(csvFilename)
 	if err != nil {
 		log.Fatalln(err.Error())
+	}
+
+	if *random {
+		shuffleQuestions(problems)
 	}
 
 	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)

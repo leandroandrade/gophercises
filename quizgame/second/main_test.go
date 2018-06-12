@@ -18,7 +18,7 @@ func TestProcessData(t *testing.T) {
 	for _, test := range tests {
 		processData(test.line, &test.problems)
 		if test.want != len(test.problems) {
-			t.Errorf("FAIL: processData = %d, want %d", len(test.problems), test.want)
+			t.Errorf("FAIL: processData(%q, %q) = %d, want %d", test.line, test.problems, len(test.problems), test.want)
 		}
 	}
 }
@@ -35,7 +35,7 @@ func TestReadFile(t *testing.T) {
 	for _, test := range tests {
 		problems, err := readFile(&test.filename)
 		if err != nil && len(problems) != test.want {
-			t.Errorf("FAIL: readFile = %d, want %d", len(problems), test.want)
+			t.Errorf("FAIL: readFile(%q) = %d, want %d", test.filename, len(problems), test.want)
 		}
 	}
 }

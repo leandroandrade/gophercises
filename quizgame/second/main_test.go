@@ -18,7 +18,7 @@ func TestProcessData(t *testing.T) {
 	for _, test := range tests {
 		processData(test.line, &test.problems)
 		if test.want != len(test.problems) {
-			t.Fatalf("FAIL: processData = %d, want %d", len(test.problems), test.want)
+			t.Errorf("FAIL: processData = %d, want %d", len(test.problems), test.want)
 		}
 	}
 }
@@ -35,7 +35,7 @@ func TestReadFile(t *testing.T) {
 	for _, test := range tests {
 		problems, err := readFile(&test.filename)
 		if err != nil && len(problems) != test.want {
-			t.Fatalf("FAIL: readFile = %d, want %d", len(problems), test.want)
+			t.Errorf("FAIL: readFile = %d, want %d", len(problems), test.want)
 		}
 	}
 }
@@ -54,10 +54,10 @@ func TestCountableAnswerCorrect(t *testing.T) {
 
 	timeout := countableAnswer(timer, answerChannel, p, &correct)
 	if timeout {
-		t.Fatalf("FAIL: countableAnswer = %t, want %t", timeout, false)
+		t.Errorf("FAIL: countableAnswer = %t, want %t", timeout, false)
 	}
 
 	if correct != 1 {
-		t.Fatalf("FAIL: countableAnswer = %v, want %v", correct, 1)
+		t.Errorf("FAIL: countableAnswer = %v, want %v", correct, 1)
 	}
 }

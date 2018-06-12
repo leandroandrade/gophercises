@@ -28,7 +28,7 @@ func TestReadFile(t *testing.T) {
 		filename string
 		want     int
 	}{
-		{"testdata/problems.csv", 2},
+		{"testdata/problems.csv", 12},
 		{"problem.csv", 0},
 	}
 

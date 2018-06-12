@@ -4,11 +4,12 @@ import (
 	"flag"
 	"os"
 	"strings"
-	"bufio"
 	"fmt"
 	"log"
 	"time"
 	"math/rand"
+	"encoding/csv"
+	"io"
 )
 
 type problem struct {
@@ -24,18 +25,24 @@ func readFile(csvFilename *string) ([]problem, error) {
 
 	problems := make([]problem, 0)
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		processData(scanner.Text(), &problems)
+	reader := csv.NewReader(file)
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		processData(record, &problems)
 	}
 	return problems, nil
 }
 
-func processData(line string, problems *[]problem) {
-	if line != "" {
-		split := strings.Split(line, ",")
+func processData(line []string, problems *[]problem) {
+	if len(line) != 0 {
 		*problems = append(*problems,
-			problem{question: split[0], answer: strings.TrimSpace(split[1])})
+			problem{question: line[0], answer: strings.TrimSpace(line[1])})
 	}
 }
 

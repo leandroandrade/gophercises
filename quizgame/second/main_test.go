@@ -8,11 +8,11 @@ import (
 func TestProcessData(t *testing.T) {
 	var tests = []struct {
 		want     int
-		line     string
+		line     []string
 		problems []problem
 	}{
-		{1, "5+5,10", make([]problem, 0)},
-		{0, "", make([]problem, 0)},
+		{1, []string{"5+5", "10"}, make([]problem, 0)},
+		{0, []string{}, make([]problem, 0)},
 	}
 
 	for _, test := range tests {

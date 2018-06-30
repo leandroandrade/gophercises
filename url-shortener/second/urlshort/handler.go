@@ -2,14 +2,29 @@ package urlshort
 
 import (
 	"net/http"
-	"gopkg.in/yaml.v2"
 	"encoding/json"
+	"github.com/leandroandrade/gophercises/url-shortener/second/database"
+	"log"
+	"github.com/leandroandrade/gophercises/url-shortener/second/file"
+	"gopkg.in/yaml.v2"
 )
 
-func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
+func Handler(pathsToUrls map[string]string, db *database.BoltDB, fallback http.Handler) http.HandlerFunc {
+	if err := db.BatchSavePathURL(pathsToUrls); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := YAMLHandler(db); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := JSONHandler(db); err != nil {
+		log.Fatal(err)
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		if destination, ok := pathsToUrls[path]; ok {
+		if destination, err := db.FindUrl(path); err == nil && destination != "" {
 			http.Redirect(w, r, destination, http.StatusFound)
 			return
 		}
@@ -17,20 +32,37 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 	}
 }
 
-func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
+func YAMLHandler(db *database.BoltDB) error {
+	yml, err := file.Read("./sources/urls.yml")
+	if err != nil {
+		panic(err)
+	}
+
 	var pathUrls []pathUrl
 	if err := yaml.Unmarshal(yml, &pathUrls); err != nil {
-		return nil, err
+		return err
 	}
-	return MapHandler(parserToMap(pathUrls), fallback), nil
+	return processBatchURLs(db, pathUrls)
 }
 
-func JSONHandler(jsonbytes []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	var pathUrls []pathUrl
-	if err := json.Unmarshal(jsonbytes, &pathUrls); err != nil {
-		return nil, err
+func JSONHandler(db *database.BoltDB) error {
+	jsonfile, err := file.Read("./sources/urls.json")
+	if err != nil {
+		panic(err)
 	}
-	return MapHandler(parserToMap(pathUrls), fallback), nil
+
+	var pathUrls []pathUrl
+	if err := json.Unmarshal(jsonfile, &pathUrls); err != nil {
+		return err
+	}
+	return processBatchURLs(db, pathUrls)
+}
+
+func processBatchURLs(db *database.BoltDB, pathUrls []pathUrl) error {
+	if err := db.BatchSavePathURL(parserToMap(pathUrls)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func parserToMap(pathUrls []pathUrl) map[string]string {

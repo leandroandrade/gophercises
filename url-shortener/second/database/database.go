@@ -7,13 +7,14 @@ import (
 )
 
 const Bucket = "paths"
+const DBName = "urlshortener.db"
 
 type BoltDB struct {
 	boltdb *bolt.DB
 }
 
 func Connect() (*BoltDB, error) {
-	db, err := bolt.Open("urlshortener.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(DBName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return nil, err
 	}

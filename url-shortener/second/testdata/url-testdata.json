@@ -1,0 +1,10 @@
+[
+  {
+    "path": "/go",
+    "url": "https://golang.org/"
+  },
+  {
+    "path": "/packages",
+    "url": "https://golang.org/pkg/"
+  }
+]

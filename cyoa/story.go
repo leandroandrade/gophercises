@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"html/template"
-)
+	)
 
 var defaultHandlerTemplate = `
 <!doctype html>
@@ -26,6 +26,12 @@ var defaultHandlerTemplate = `
     {{end}}
     </ul>
 </body>`
+
+var templateDefault *template.Template
+
+func init() {
+	templateDefault = template.Must(template.ParseFiles("page.html"))
+}
 
 type Story map[string]Chapter
 
@@ -59,8 +65,7 @@ type handler struct {
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//tpl := template.Must(template.New("").Parse(defaultHandlerTemplate))
 
-	tpl := template.Must(template.ParseFiles("page.html"))
-	if err := tpl.Execute(w, h.story["intro"]); err != nil {
+	if err := templateDefault.Execute(w, h.story["intro"]); err != nil {
 		panic(err)
 	}
 }

@@ -57,7 +57,9 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	tpl := template.Must(template.New("").Parse(defaultHandlerTemplate))
+	//tpl := template.Must(template.New("").Parse(defaultHandlerTemplate))
+
+	tpl := template.Must(template.ParseFiles("page.html"))
 	if err := tpl.Execute(w, h.story["intro"]); err != nil {
 		panic(err)
 	}

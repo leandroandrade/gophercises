@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"html/template"
-	)
+	"strings"
+	"log"
+)
 
 var defaultHandlerTemplate = `
 <!doctype html>
@@ -63,9 +65,19 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//tpl := template.Must(template.New("").Parse(defaultHandlerTemplate))
-
-	if err := templateDefault.Execute(w, h.story["intro"]); err != nil {
-		panic(err)
+	path := strings.TrimSpace(r.URL.Path)
+	if path == "" || path == "/" {
+		path = "/intro"
 	}
+	path = path[1:]
+
+	if chapter, ok := h.story[path]; ok {
+		if err := templateDefault.Execute(w, chapter); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, "Something went wrong...", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	http.Error(w, "Chapter not found.", http.StatusNotFound)
 }
